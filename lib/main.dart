@@ -10,6 +10,9 @@ TfliteService tfliteService = TfliteService();
 Future<void> main() async {
   // 2. Pastikan inisialisasi binding Flutter sudah siap
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Pastikan baris ini ada dan menggunakan 'await'
+  await tfliteService.loadModel();
   
   try {
     // 3. Ambil daftar kamera sebelum aplikasi dijalankan
