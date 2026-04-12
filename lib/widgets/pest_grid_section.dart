@@ -33,6 +33,8 @@ class PestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String imageName = name.toLowerCase().replaceAll(' ', '_');
+
     return Container(
       width: 110, // Lebar kartu disesuaikan
       height: 160, // Tinggi kartu agar terlihat vertikal seperti di gambar
@@ -41,12 +43,12 @@ class PestCard extends StatelessWidget {
         color: Colors.grey[300], // Warna placeholder sebelum ada gambar asli
         borderRadius: BorderRadius.circular(12),
         // Nanti kalau sudah ada gambar, gunakan dekorasi di bawah ini:
-        /*
+        
         image: DecorationImage(
-          image: AssetImage('assets/images/${name.toLowerCase().replaceAll(' ', '_')}.jpg'),
+          image: AssetImage('assets/images/$imageName.jpg'),
           fit: BoxFit.cover,
         ),
-        */
+        
       ),
       child: Stack(
         children: [
@@ -58,7 +60,7 @@ class PestCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
+                color: Color(0xFFE9EFEF).withOpacity(0.9),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -67,7 +69,7 @@ class PestCard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2E5959),
+                  color: Color(0xFF265F61),
                 ),
               ),
             ),

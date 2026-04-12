@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

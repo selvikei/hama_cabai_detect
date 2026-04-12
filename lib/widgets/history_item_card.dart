@@ -9,7 +9,7 @@ class HistoryItemCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 18),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFFE9EFEF),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -19,7 +19,7 @@ class HistoryItemCard extends StatelessWidget {
             child: Container(
               width: 70,
               height: 70,
-              color: Colors.grey[300],
+              color: Colors.white,
               child: const Icon(Icons.image),
             ),
           ),
@@ -27,7 +27,7 @@ class HistoryItemCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Kutu daun (Aphis Gossypii)", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+              Text("Kutu daun (Aphis Gossypii)", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF265F61)),),
               Text("Tanggal : 16 Juni 20205", style: TextStyle(color: Colors.grey, fontSize: 12)),
               Text("Jam : 07.13", style: TextStyle(color: Colors.grey, fontSize: 12),),
             ],

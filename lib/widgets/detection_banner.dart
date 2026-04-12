@@ -8,7 +8,7 @@ class DetectionBanner extends StatelessWidget {
     return  Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF2E5959),
+        color: const Color(0xFF265F61),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Row(
