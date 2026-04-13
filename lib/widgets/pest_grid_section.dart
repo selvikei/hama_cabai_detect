@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../data/pest_data.dart';
+import '../screens/pest_detail_screen.dart';
 
 class PestGridSection extends StatelessWidget {
   const PestGridSection({super.key});
@@ -35,46 +37,67 @@ class PestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     String imageName = name.toLowerCase().replaceAll(' ', '_');
 
-    return Container(
-      width: 110, // Lebar kartu disesuaikan
-      height: 160, // Tinggi kartu agar terlihat vertikal seperti di gambar
-      margin: const EdgeInsets.only(right: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey[300], // Warna placeholder sebelum ada gambar asli
-        borderRadius: BorderRadius.circular(12),
-        // Nanti kalau sudah ada gambar, gunakan dekorasi di bawah ini:
-        
-        image: DecorationImage(
-          image: AssetImage('assets/images/$imageName.jpg'),
-          fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () {
+        // 2. Cari data detail hama dari PestData berdasarkan nama
+        final selectedPest = PestData.allPests.firstWhere(
+          (p) => p.name == name,
+          orElse: () => PestData.allPests[0], // Fallback jika tidak ketemu
+        );
+
+        // 3. Navigasi ke PestDetailScreen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PestDetailScreen(
+              name: selectedPest.name,
+              description: selectedPest.description,
+              imagePath: selectedPest.imagePath,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: 110, // Lebar kartu disesuaikan
+        height: 160, // Tinggi kartu agar terlihat vertikal seperti di gambar
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey[300], // Warna placeholder sebelum ada gambar asli
+          borderRadius: BorderRadius.circular(12),
+          // Nanti kalau sudah ada gambar, gunakan dekorasi di bawah ini:
+          
+          image: DecorationImage(
+            image: AssetImage('assets/images/$imageName.jpg'),
+            fit: BoxFit.cover,
+          ),
+          
         ),
-        
-      ),
-      child: Stack(
-        children: [
-          // Label Nama Hama di bagian bawah
-          Positioned(
-            bottom: 10,
-            left: 8,
-            right: 8,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-              decoration: BoxDecoration(
-                color: Color(0xFFE9EFEF).withOpacity(0.9),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                name,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF265F61),
+        child: Stack(
+          children: [
+            // Label Nama Hama di bagian bawah
+            Positioned(
+              bottom: 10,
+              left: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: Color(0xFFE9EFEF).withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  name,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF265F61),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
