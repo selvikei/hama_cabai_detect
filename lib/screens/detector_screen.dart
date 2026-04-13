@@ -38,7 +38,8 @@ class _DetectorScreenState extends State<DetectorScreen> {
           builder: (context) => ResultScreen(
             imagePath: pickedFile.path,
             label: result['label'], // Hasil dari TfliteService
-            confidence: result['confidence'].toString(), // Akurasi dari TfliteService
+            confidence: result['confidence']
+                .toString(), // Akurasi dari TfliteService
           ),
         ),
       );
@@ -185,7 +186,23 @@ class _DetectorScreenState extends State<DetectorScreen> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: CameraPreview(controller!),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SizedBox(
+                      width: constraints.maxWidth,
+                      height: constraints.maxHeight,
+                      child: FittedBox(
+                        fit: BoxFit
+                            .cover, // Ini kuncinya! Gambar akan dipotong dikit tapi tidak penyet
+                        child: SizedBox(
+                          width: controller!.value.previewSize!.height,
+                          height: controller!.value.previewSize!.width,
+                          child: CameraPreview(controller!),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
