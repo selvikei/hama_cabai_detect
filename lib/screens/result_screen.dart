@@ -3,17 +3,35 @@ import 'dart:io';
 
 class ResultScreen extends StatelessWidget {
   final String imagePath;
-  final String label;      
+  final String label;
   final String confidence;
+  // Tambahkan koordinat (biasanya dalam skala 0.0 sampai 1.0)
+  final double x, y, w, h;
 
   const ResultScreen({
-    super.key, 
+    super.key,
     required this.imagePath,
     required this.label,
-    required this.confidence,});
+    required this.confidence,
+    required this.x,
+    required this.y,
+    required this.w,
+    required this.h,
+  });
 
   @override
   Widget build(BuildContext context) {
+    print("DEBUG BOX: x=$x, y=$y, w=$w, h=$h, label=$label");
+    // Ambil ukuran lebar layar HP user
+    // 1. Tentukan lebar tampilan (lebar layar dikurangi padding)
+    double displaySize = MediaQuery.of(context).size.width - 40;
+
+    // Menghitung posisi kotak (Skala 640 ke ukuran layar)
+    double left = x * displaySize;
+    double top = y * displaySize;
+    double width = w * displaySize;
+    double height = h * displaySize;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Hasil Deteksi"),
@@ -26,26 +44,72 @@ class ResultScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 1. Preview Gambar yang Diambil
-            Container(
-              margin: const EdgeInsets.all(20),
-              width: double.infinity,
-              height: 300,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.grey[300],
-                // Placeholder gambar
-              ),
+            const SizedBox(height: 20),
+            // BUNGKUS DENGAN CENTER AGAR POSISI DI TENGAH
+            Center(
+              child: Container(
+                width: displaySize,
+                height: displaySize, // PAKSA JADI KOTAK (1:1)
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Image.file(
-                    File(imagePath),
-                    fit: BoxFit.cover,
+                  child: Stack(
+                    children: [
+                      // GAMBAR ASLI
+                      Image.file(
+                        File(imagePath),
+                        width: displaySize,
+                        height: displaySize,
+                        fit: BoxFit
+                            .fill, // FIT FILL agar sama dengan input 640x640 model
+                      ),
+
+                      // BOUNDING BOX
+                      if (double.tryParse(confidence) != null &&
+                          double.parse(confidence) > 50)
+                        Positioned(
+                          // Koordinat x, y, w, h (0.0 - 1.0) dikalikan dengan ukuran kotak tampilan
+                          left: x * displaySize,
+                          top: y * displaySize,
+                          child: Container(
+                            width: w * displaySize,
+                            height: h * displaySize,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.red, width: 3),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Container(
+                                color: Colors.red,
+                                padding: const EdgeInsets.all(2),
+                                child: Text(
+                                  "$label $confidence%",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
-              
+              ),
             ),
 
+            const SizedBox(height: 30),
             // 2. Kartu Detail Hasil
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -72,7 +136,10 @@ class ResultScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Tingkat Akurasi", style: TextStyle(fontSize: 16)),
+                          Text(
+                            "Tingkat Akurasi",
+                            style: TextStyle(fontSize: 16),
+                          ),
                           Text(
                             "$confidence%",
                             style: TextStyle(
@@ -103,9 +170,14 @@ class ResultScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2E5959),
                       minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                    child: const Text("Simpan ke Riwayat", style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      "Simpan ke Riwayat",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   OutlinedButton(
@@ -113,9 +185,14 @@ class ResultScreen extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 50),
                       side: const BorderSide(color: Color(0xFF2E5959)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                    child: const Text("Deteksi Lagi", style: TextStyle(color: Color(0xFF2E5959))),
+                    child: const Text(
+                      "Deteksi Lagi",
+                      style: TextStyle(color: Color(0xFF2E5959)),
+                    ),
                   ),
                 ],
               ),

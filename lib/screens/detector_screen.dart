@@ -40,6 +40,10 @@ class _DetectorScreenState extends State<DetectorScreen> {
             label: result['label'], // Hasil dari TfliteService
             confidence: result['confidence']
                 .toString(), // Akurasi dari TfliteService
+            x: result["x"] ?? 0.0,
+            y: result["y"] ?? 0.0,
+            w: result["w"] ?? 0.0,
+            h: result["h"] ?? 0.0,
           ),
         ),
       );
@@ -111,6 +115,10 @@ class _DetectorScreenState extends State<DetectorScreen> {
             imagePath: image.path,
             label: result["label"],
             confidence: result["confidence"].toString(),
+            x: result["x"] ?? 0.0,
+            y: result["y"] ?? 0.0,
+            w: result["w"] ?? 0.0,
+            h: result["h"] ?? 0.0,
           ),
         ),
       );

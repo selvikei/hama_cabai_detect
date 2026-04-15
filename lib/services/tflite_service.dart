@@ -68,34 +68,66 @@ class TfliteService {
       // --- C. MENJALANKAN INFERENCE ---
       _interpreter!.run(input, output);
 
-      // --- D. POST-PROCESSING ---
+      // D. POST-PROCESSING (Ekstraksi Data)
       double highestProb = 0.0;
-      int highestIdx = 0;
+      int highestIdx = -1;
+
+      // Variabel penampung koordinat mentah dari model
+      double rawCenterX = 0.0;
+      double rawCenterY = 0.0;
+      double rawWidth = 0.0;
+      double rawHeight = 0.0;
 
       for (int i = 0; i < 8400; i++) {
+        // Loop untuk cek skor kelas (indeks 4 sampai 7)
         for (int j = 4; j < 8; j++) {
           if (output[0][j][i] > highestProb) {
             highestProb = output[0][j][i];
             highestIdx = j - 4;
+
+            // Ambil koordinat pembentuk kotak (indeks 0, 1, 2, 3)
+            rawCenterX = output[0][0][i];
+            rawCenterY = output[0][1][i];
+            rawWidth = output[0][2][i];
+            rawHeight = output[0][3][i];
           }
         }
       }
 
-      // Tambahkan logika Threshold di sini (Misal: minimal 50% akurasi)
-      if (highestProb < 0.5) {
+      // E. KONVERSI COORDINATE (Center-to-Corner & Normalisasi)
+      // Kita ubah ke skala 0.0 - 1.0 agar fleksibel dengan ukuran layar HP manapun
+      double x = (rawCenterX - (rawWidth / 2));
+      double y = (rawCenterY - (rawHeight / 2));
+      double w = rawWidth;
+      double h = rawHeight;
+
+      // F. LOGIKA THRESHOLD
+      if (highestProb < 0.5 || highestIdx == -1) {
         return {
           "label": "Tidak Terdapat Hama",
           "confidence": (highestProb * 100).toStringAsFixed(1),
+          "x": 0.0,
+          "y": 0.0,
+          "w": 0.0,
+          "h": 0.0,
         };
       }
 
       return {
         "label": _labels![highestIdx],
         "confidence": (highestProb * 100).toStringAsFixed(1),
+        "x": x, "y": y, "w": w, "h": h, // Kirim koordinat ternormalisasi
       };
     } catch (e) {
       debugPrint("Error saat prediksi: $e");
-      return {"label": "Error", "confidence": 0.0};
+      return {
+        "label": "Error",
+        "confidence": "0.0",
+        "x": 0.0,
+        "y": 0.0,
+        "w": 0.0,
+        "h": 0.0,
+      };
     }
   }
 
@@ -103,5 +135,3 @@ class TfliteService {
     _interpreter?.close();
   }
 }
-
-
