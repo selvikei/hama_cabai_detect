@@ -3,34 +3,24 @@ import 'dart:io';
 
 class ResultScreen extends StatelessWidget {
   final String imagePath;
-  final String label;
-  final String confidence;
-  // Tambahkan koordinat (biasanya dalam skala 0.0 sampai 1.0)
-  final double x, y, w, h;
+  // Menangkap List hasil deteksi dari DetectorScreen
+  final List<Map<String, dynamic>> detections;
 
   const ResultScreen({
     super.key,
     required this.imagePath,
-    required this.label,
-    required this.confidence,
-    required this.x,
-    required this.y,
-    required this.w,
-    required this.h,
+    required this.detections,
   });
 
   @override
   Widget build(BuildContext context) {
-    print("DEBUG BOX: x=$x, y=$y, w=$w, h=$h, label=$label");
-    // Ambil ukuran lebar layar HP user
-    // 1. Tentukan lebar tampilan (lebar layar dikurangi padding)
     double displaySize = MediaQuery.of(context).size.width - 40;
 
-    // Menghitung posisi kotak (Skala 640 ke ukuran layar)
-    double left = x * displaySize;
-    double top = y * displaySize;
-    double width = w * displaySize;
-    double height = h * displaySize;
+    // Ambil data untuk card ringkasan di bawah
+    // Jika ada deteksi, ambil hama dengan confidence tertinggi (urutan pertama)
+    String topLabel = detections.isNotEmpty ? detections[0]['label'] : "Tidak Terdapat Hama";
+    String topConfidence = detections.isNotEmpty ? detections[0]['confidence'] : "0.0";
+    int totalDetected = detections.length;
 
     return Scaffold(
       appBar: AppBar(
@@ -45,11 +35,10 @@ class ResultScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            // BUNGKUS DENGAN CENTER AGAR POSISI DI TENGAH
             Center(
               child: Container(
                 width: displaySize,
-                height: displaySize, // PAKSA JADI KOTAK (1:1)
+                height: displaySize,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
@@ -68,41 +57,44 @@ class ResultScreen extends StatelessWidget {
                         File(imagePath),
                         width: displaySize,
                         height: displaySize,
-                        fit: BoxFit
-                            .fill, // FIT FILL agar sama dengan input 640x640 model
+                        fit: BoxFit.fill, 
                       ),
 
-                      // BOUNDING BOX
-                      if (double.tryParse(confidence) != null &&
-                          double.parse(confidence) > 50)
-                        Positioned(
-                          // Koordinat x, y, w, h (0.0 - 1.0) dikalikan dengan ukuran kotak tampilan
-                          left: x * displaySize,
-                          top: y * displaySize,
+                      // LOOPING BOUNDING BOX (MENGGAMBAR SEMUA KOTAK)
+                      ...detections.map((det) {
+                        double x = det['x'] * displaySize;
+                        double y = det['y'] * displaySize;
+                        double w = det['w'] * displaySize;
+                        double h = det['h'] * displaySize;
+
+                        return Positioned(
+                          left: x,
+                          top: y,
                           child: Container(
-                            width: w * displaySize,
-                            height: h * displaySize,
+                            width: w,
+                            height: h,
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.red, width: 3),
-                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: Colors.red, width: 0.01),
+                              borderRadius: BorderRadius.circular(0),
                             ),
-                            child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Container(
-                                color: Colors.red,
-                                padding: const EdgeInsets.all(2),
-                                child: Text(
-                                  "$label $confidence%",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
+                            // child: Align(
+                            //   alignment: Alignment.topLeft,
+                            //   child: Container(
+                            //     color: Colors.red,
+                            //     padding: const EdgeInsets.all(0),
+                            //     child: Text(
+                            //       "${det['label']} ${det['confidence']}%",
+                            //       style: const TextStyle(
+                            //         color: Colors.white,
+                            //         fontSize: 8, // Diperkecil agar tidak menutupi hama lain
+                            //         fontWeight: FontWeight.bold,
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
                           ),
-                        ),
+                        );
+                      }).toList(),
                     ],
                   ),
                 ),
@@ -110,12 +102,13 @@ class ResultScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 30),
-            // 2. Kartu Detail Hasil
+            
+            // KARTU DETAIL HASIL (Menampilkan hama terbanyak/tertinggi)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Card(
                 elevation: 0,
-                color: const Color(0xFFF0F7F0), // Hijau sangat muda
+                color: const Color(0xFFF0F7F0), 
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                   side: const BorderSide(color: Color(0xFF2E5959), width: 1),
@@ -125,24 +118,31 @@ class ResultScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        label,
-                        style: TextStyle(
+                        topLabel,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF2E5959),
                         ),
                       ),
+                      const SizedBox(height: 5),
+                      // Tambahan info jumlah hama yang terdeteksi
+                      if (totalDetected > 0)
+                        Text(
+                          "Terdeteksi $totalDetected objek",
+                          style: const TextStyle(color: Colors.grey, fontSize: 14),
+                        ),
                       const Divider(height: 30),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Tingkat Akurasi",
+                          const Text(
+                            "Akurasi Tertinggi",
                             style: TextStyle(fontSize: 16),
                           ),
                           Text(
-                            "$confidence%",
-                            style: TextStyle(
+                            "$topConfidence%",
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.green,
@@ -158,7 +158,7 @@ class ResultScreen extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // 3. Tombol Aksi
+            // TOMBOL AKSI
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
