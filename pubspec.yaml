@@ -62,7 +62,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/models/hama_model.tflite
+    - assets/models/yolov8s-training-4.tflite
     - assets/models/labels.txt
     - assets/images/
 

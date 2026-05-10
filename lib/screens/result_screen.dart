@@ -3,7 +3,6 @@ import 'dart:io';
 
 class ResultScreen extends StatelessWidget {
   final String imagePath;
-  // Menangkap List hasil deteksi dari DetectorScreen
   final List<Map<String, dynamic>> detections;
 
   const ResultScreen({
@@ -12,29 +11,38 @@ class ResultScreen extends StatelessWidget {
     required this.detections,
   });
 
+  // Fungsi Helper untuk menentukan warna (Hama = Warna khusus, Tidak ada = Hijau)
+  Color _getBoxColor(String label) {
+    String cleanLabel = label.trim().toLowerCase();
+    if (cleanLabel.contains('daun')) return Colors.purple; 
+    if (cleanLabel.contains('kebul')) return Colors.red;    
+    if (cleanLabel.contains('thrips')) return Colors.blue;  
+    if (cleanLabel.contains('tidak terdapat hama')) return Color(0xFF2E5959); // Hijau asal
+    return Colors.black;
+  }
+
   @override
   Widget build(BuildContext context) {
     double displaySize = MediaQuery.of(context).size.width - 40;
 
-    // Ambil data untuk card ringkasan di bawah
-    // Jika ada deteksi, ambil hama dengan confidence tertinggi (urutan pertama)
+    // Data label utama
     String topLabel = detections.isNotEmpty ? detections[0]['label'] : "Tidak Terdapat Hama";
-    String topConfidence = detections.isNotEmpty ? detections[0]['confidence'] : "0.0";
-    int totalDetected = detections.length;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAF8),
       appBar: AppBar(
         title: const Text("Hasil Deteksi"),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 20),
+            
+            // --- AREA GAMBAR & BOUNDING BOX ---
             Center(
               child: Container(
                 width: displaySize,
@@ -43,8 +51,9 @@ class ResultScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withOpacity(0.05),
                       blurRadius: 10,
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
@@ -52,20 +61,19 @@ class ResultScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   child: Stack(
                     children: [
-                      // GAMBAR ASLI
                       Image.file(
                         File(imagePath),
                         width: displaySize,
                         height: displaySize,
                         fit: BoxFit.fill, 
                       ),
-
-                      // LOOPING BOUNDING BOX (MENGGAMBAR SEMUA KOTAK)
+                      // Gambar semua kotak tanpa teks
                       ...detections.map((det) {
                         double x = det['x'] * displaySize;
                         double y = det['y'] * displaySize;
                         double w = det['w'] * displaySize;
                         double h = det['h'] * displaySize;
+                        Color color = _getBoxColor(det['label']);
 
                         return Positioned(
                           left: x,
@@ -74,24 +82,9 @@ class ResultScreen extends StatelessWidget {
                             width: w,
                             height: h,
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.red, width: 0.01),
-                              borderRadius: BorderRadius.circular(0),
+                              border: Border.all(color: color, width: 1.5),
+                              borderRadius: BorderRadius.circular(2),
                             ),
-                            // child: Align(
-                            //   alignment: Alignment.topLeft,
-                            //   child: Container(
-                            //     color: Colors.red,
-                            //     padding: const EdgeInsets.all(0),
-                            //     child: Text(
-                            //       "${det['label']} ${det['confidence']}%",
-                            //       style: const TextStyle(
-                            //         color: Colors.white,
-                            //         fontSize: 8, // Diperkecil agar tidak menutupi hama lain
-                            //         fontWeight: FontWeight.bold,
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
                           ),
                         );
                       }).toList(),
@@ -101,9 +94,9 @@ class ResultScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 30),
-            
-            // KARTU DETAIL HASIL (Menampilkan hama terbanyak/tertinggi)
+            const SizedBox(height: 25),
+
+            // --- KARTU HASIL SEDERHANA ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Card(
@@ -114,84 +107,63 @@ class ResultScreen extends StatelessWidget {
                   side: const BorderSide(color: Color(0xFF2E5959), width: 1),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Text(
-                        topLabel,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2E5959),
-                        ),
+                  padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                  child: Center(
+                    child: Text(
+                      topLabel,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: _getBoxColor(topLabel), // Hijau jika tidak ada hama
                       ),
-                      const SizedBox(height: 5),
-                      // Tambahan info jumlah hama yang terdeteksi
-                      if (totalDetected > 0)
-                        Text(
-                          "Terdeteksi $totalDetected objek",
-                          style: const TextStyle(color: Colors.grey, fontSize: 14),
-                        ),
-                      const Divider(height: 30),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Akurasi Tertinggi",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Text(
-                            "$topConfidence%",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 25),
 
-            // TOMBOL AKSI
+            // --- TOMBOL AKSI SEJAJAR ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
+              child: Row(
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      // Logika simpan riwayat
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E5959),
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Logika simpan
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2E5959),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
                       ),
-                    ),
-                    child: const Text(
-                      "Simpan ke Riwayat",
-                      style: TextStyle(color: Colors.white),
+                      child: const Text(
+                        "Simpan",
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
-                      side: const BorderSide(color: Color(0xFF2E5959)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        side: const BorderSide(color: Color(0xFF2E5959), width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: const Text(
-                      "Deteksi Lagi",
-                      style: TextStyle(color: Color(0xFF2E5959)),
+                      child: const Text(
+                        "Deteksi Lagi",
+                        style: TextStyle(color: Color(0xFF2E5959), fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ],
