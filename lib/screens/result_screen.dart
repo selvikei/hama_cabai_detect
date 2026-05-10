@@ -12,14 +12,33 @@ class ResultScreen extends StatelessWidget {
     required this.detections,
   });
 
+  Color _getBoxColor(String label) {
+    // Ubah ke huruf kecil dan hapus spasi di ujung agar pencocokan lebih akurat
+    String cleanLabel = label.trim().toLowerCase();
+
+    if (cleanLabel.contains('daun')) {
+      return Colors.purple;
+    } else if (cleanLabel.contains('kebul')) {
+      return Colors.red;
+    } else if (cleanLabel.contains('thrips')) {
+      return Colors.blue;
+    } else {
+      return Colors.black; // Warna jika tidak ada yang cocok
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double displaySize = MediaQuery.of(context).size.width - 40;
 
     // Ambil data untuk card ringkasan di bawah
     // Jika ada deteksi, ambil hama dengan confidence tertinggi (urutan pertama)
-    String topLabel = detections.isNotEmpty ? detections[0]['label'] : "Tidak Terdapat Hama";
-    String topConfidence = detections.isNotEmpty ? detections[0]['confidence'] : "0.0";
+    String topLabel = detections.isNotEmpty
+        ? detections[0]['label']
+        : "Tidak Terdapat Hama";
+    String topConfidence = detections.isNotEmpty
+        ? detections[0]['confidence']
+        : "0.0";
     int totalDetected = detections.length;
 
     return Scaffold(
@@ -57,7 +76,7 @@ class ResultScreen extends StatelessWidget {
                         File(imagePath),
                         width: displaySize,
                         height: displaySize,
-                        fit: BoxFit.fill, 
+                        fit: BoxFit.fill,
                       ),
 
                       // LOOPING BOUNDING BOX (MENGGAMBAR SEMUA KOTAK)
@@ -74,7 +93,10 @@ class ResultScreen extends StatelessWidget {
                             width: w,
                             height: h,
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.red, width: 0.01),
+                              border: Border.all(
+                                color: _getBoxColor(det['label']),
+                                width: 1,
+                              ),
                               borderRadius: BorderRadius.circular(0),
                             ),
                             // child: Align(
@@ -102,13 +124,13 @@ class ResultScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 30),
-            
+
             // KARTU DETAIL HASIL (Menampilkan hama terbanyak/tertinggi)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Card(
                 elevation: 0,
-                color: const Color(0xFFF0F7F0), 
+                color: const Color(0xFFF0F7F0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                   side: const BorderSide(color: Color(0xFF2E5959), width: 1),
@@ -130,14 +152,17 @@ class ResultScreen extends StatelessWidget {
                       if (totalDetected > 0)
                         Text(
                           "Terdeteksi $totalDetected objek",
-                          style: const TextStyle(color: Colors.grey, fontSize: 14),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
                         ),
                       const Divider(height: 30),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            "Akurasi Tertinggi",
+                            "Skor Prediksi",
                             style: TextStyle(fontSize: 16),
                           ),
                           Text(
