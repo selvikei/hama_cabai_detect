@@ -63,7 +63,7 @@ class PestCard extends StatelessWidget {
         margin: const EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           color: Colors.grey[300], // Warna placeholder sebelum ada gambar asli
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(6),
           // Nanti kalau sudah ada gambar, gunakan dekorasi di bawah ini:
           
           image: DecorationImage(
@@ -89,8 +89,9 @@ class PestCard extends StatelessWidget {
                   name,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
+                    fontFamily: 'PlusJakartaSans',
                     fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: Color(0xFF265F61),
                   ),
                 ),

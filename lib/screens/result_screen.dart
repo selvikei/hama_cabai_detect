@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import '../data/database_helper.dart';
+import '../models/history_mode.dart';
 
 class ResultScreen extends StatelessWidget {
   final String imagePath;
@@ -14,10 +16,11 @@ class ResultScreen extends StatelessWidget {
   // Fungsi Helper untuk menentukan warna (Hama = Warna khusus, Tidak ada = Hijau)
   Color _getBoxColor(String label) {
     String cleanLabel = label.trim().toLowerCase();
-    if (cleanLabel.contains('daun')) return Colors.purple; 
-    if (cleanLabel.contains('kebul')) return Colors.red;    
-    if (cleanLabel.contains('thrips')) return Colors.blue;  
-    if (cleanLabel.contains('tidak terdapat hama')) return Color(0xFF2E5959); // Hijau asal
+    if (cleanLabel.contains('daun')) return Colors.purple;
+    if (cleanLabel.contains('kebul')) return Colors.red;
+    if (cleanLabel.contains('thrips')) return Colors.blue;
+    if (cleanLabel.contains('tidak terdapat hama'))
+      return Color(0xFF2E5959); // Hijau asal
     return Colors.black;
   }
 
@@ -26,7 +29,14 @@ class ResultScreen extends StatelessWidget {
     double displaySize = MediaQuery.of(context).size.width - 40;
 
     // Data label utama
-    String topLabel = detections.isNotEmpty ? detections[0]['label'] : "Tidak Terdapat Hama";
+    String topLabel = detections.isNotEmpty
+        ? detections[0]['label']
+        : "Tidak Terdapat Hama";
+
+    // Ambil confidence score untuk disimpan ke history (walaupun tidak ditampilkan di UI)
+    String topConfidence = detections.isNotEmpty
+        ? detections[0]['confidence']
+        : "0.0";
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAF8),
@@ -41,7 +51,7 @@ class ResultScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            
+
             // --- AREA GAMBAR & BOUNDING BOX ---
             Center(
               child: Container(
@@ -65,7 +75,7 @@ class ResultScreen extends StatelessWidget {
                         File(imagePath),
                         width: displaySize,
                         height: displaySize,
-                        fit: BoxFit.fill, 
+                        fit: BoxFit.fill,
                       ),
                       // Gambar semua kotak tanpa teks
                       ...detections.map((det) {
@@ -101,13 +111,16 @@ class ResultScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Card(
                 elevation: 0,
-                color: const Color(0xFFF0F7F0), 
+                color: const Color(0xFFF0F7F0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                   side: const BorderSide(color: Color(0xFF2E5959), width: 1),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 30,
+                    horizontal: 20,
+                  ),
                   child: Center(
                     child: Text(
                       topLabel,
@@ -115,7 +128,9 @@ class ResultScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: _getBoxColor(topLabel), // Hijau jika tidak ada hama
+                        color: _getBoxColor(
+                          topLabel,
+                        ), // Hijau jika tidak ada hama
                       ),
                     ),
                   ),
@@ -132,8 +147,24 @@ class ResultScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Logika simpan
+                      // Di dalam ResultScreen, pada bagian ElevatedButton "Simpan"
+                      onPressed: () async {
+                        final history = HistoryModel(
+                          imagePath: imagePath,
+                          detectedClass: topLabel,
+                          confidenceScore: topConfidence,
+                          detectedAt: DateTime.now().toString(),
+                        );
+
+                        await DatabaseHelper.instance.insertHistory(history);
+
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Berhasil disimpan ke riwayat!"),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2E5959),
@@ -145,7 +176,10 @@ class ResultScreen extends StatelessWidget {
                       ),
                       child: const Text(
                         "Simpan",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -155,14 +189,20 @@ class ResultScreen extends StatelessWidget {
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 15),
-                        side: const BorderSide(color: Color(0xFF2E5959), width: 1.5),
+                        side: const BorderSide(
+                          color: Color(0xFF2E5959),
+                          width: 1.5,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       child: const Text(
                         "Deteksi Lagi",
-                        style: TextStyle(color: Color(0xFF2E5959), fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Color(0xFF2E5959),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),

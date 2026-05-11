@@ -34,6 +34,7 @@ class RobopestApp extends StatelessWidget {
       debugShowCheckedModeBanner: false, // Menghilangkan banner debug
       title: 'Robopest',
       theme: ThemeData(
+        fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xFFF5F9F5), // Warna background tema kamu
         useMaterial3: true,
         primaryColor: const Color(0xFF2E5959),
