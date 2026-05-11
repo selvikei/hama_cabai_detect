@@ -9,7 +9,7 @@ class DetectionBanner extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: const Color(0xFF265F61),
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -17,9 +17,9 @@ class DetectionBanner extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
-              Text("Deteksi di sini", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              Text("Deteksi di sini", style: TextStyle(fontFamily: 'Poppins',color: Colors.white, fontSize: 24, fontWeight: FontWeight.w500)),
               SizedBox(height: 5),
-              Text("Mulailah Deteksi Hama Cabaimu", style: TextStyle(color: Colors.white, fontSize: 14)),
+              Text("Mulailah Deteksi Tanaman Cabaimu", style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w300,color: Colors.white, fontSize: 12)),
             ],
           ),
           const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 40,)

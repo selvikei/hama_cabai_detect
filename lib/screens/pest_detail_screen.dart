@@ -54,7 +54,7 @@ class PestDetailScreen extends StatelessWidget {
               // 3. Teks Deskripsi
               Text(
                 description,
-                textAlign: TextAlign.justify,
+                textAlign: TextAlign.left,
                 style: const TextStyle(
                   fontSize: 14,
                   height: 1.6,

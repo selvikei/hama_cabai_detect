@@ -162,10 +162,10 @@ class _DetectorScreenState extends State<DetectorScreen> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.black,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(0),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(0),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         return SizedBox(

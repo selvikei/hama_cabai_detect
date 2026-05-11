@@ -24,12 +24,12 @@ class HeaderSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 Text(
-                  "Hallo, Teman cabai!",
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                  "Hallo, Teman Cabai!",
+                  style: TextStyle(fontFamily: 'LeagueSpartan',fontSize: 20.0, fontWeight: FontWeight.w500),
                 ),
                 Text(
                   "Periksa kondisi tanaman cabaimu",
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(fontFamily: 'LeagueSpartan', fontWeight: FontWeight.w200, fontSize: 14,color: Colors.grey),
                 )
               ],
             ),
