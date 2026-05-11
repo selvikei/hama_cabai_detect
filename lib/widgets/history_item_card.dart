@@ -1,38 +1,85 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import '../models/history_mode.dart'; // Pastikan import model kamu
+import '../screens/history_detail_screen.dart'; // Pastikan import screen detail
 
 class HistoryItemCard extends StatelessWidget {
-  const HistoryItemCard({super.key});
+  final HistoryModel history;
+  final VoidCallback? onDelete; // Opsional: untuk fitur hapus
+
+  const HistoryItemCard({
+    super.key, 
+    required this.history,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 18),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Color(0xFFE9EFEF),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadiusGeometry.circular(8),
-            child: Container(
-              width: 70,
-              height: 70,
-              color: Colors.white,
-              child: const Icon(Icons.image),
+    // Parsing tanggal dan waktu
+    DateTime dateTime = DateTime.parse(history.detectedAt);
+    String datePart = "${dateTime.day}/${dateTime.month}/${dateTime.year}";
+    String timePart = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+
+    return GestureDetector(
+      onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HistoryDetailScreen(history: history),
+        ),
+      );
+    },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 18),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE9EFEF),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            // Tampilkan Gambar dari File Path
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                width: 70,
+                height: 70,
+                child: Image.file(
+                  File(history.imagePath),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.white,
+                    child: const Icon(Icons.broken_image, color: Colors.grey),
+                  ),
+                ),
+              ),
             ),
-          ),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Kutu daun (Aphis Gossypii)", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF265F61)),),
-              Text("Tanggal : 16 Juni 20205", style: TextStyle(color: Colors.grey, fontSize: 12)),
-              Text("Jam : 07.13", style: TextStyle(color: Colors.grey, fontSize: 12),),
-            ],
-          )
-        ],
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    history.detectedClass,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      fontSize: 16, 
+                      color: Color(0xFF265F61),
+                    ),
+                  ),
+                  Text("Tanggal : $datePart", style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                  Text("Jam : $timePart", style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                ],
+              ),
+            ),
+            // Ikon Hapus jika diperlukan
+            if (onDelete != null)
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                onPressed: onDelete,
+              ),
+          ],
+        ),
       ),
     );
   }
