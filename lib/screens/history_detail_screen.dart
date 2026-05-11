@@ -1,11 +1,51 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import '../models/history_mode.dart';
+import '../data/database_helper.dart';
 
 class HistoryDetailScreen extends StatelessWidget {
   final HistoryModel history;
 
   const HistoryDetailScreen({super.key, required this.history});
+
+  // Fungsi untuk menampilkan dialog konfirmasi dan menghapus data
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text("Hapus Riwayat"),
+          content: const Text("Apakah Anda yakin ingin menghapus riwayat ini?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("Batal"),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Pastikan model HistoryModel memiliki field 'id'
+                if (history.id != null) {
+                  await DatabaseHelper.instance.deleteHistory(history.id!);
+                  // Tutup dialog
+                  if (context.mounted) Navigator.pop(dialogContext);
+                  // Kembali ke halaman sebelumnya (List Riwayat)
+                  if (context.mounted) Navigator.pop(context);
+
+                  // Opsional: Tampilkan SnackBar
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Riwayat berhasil dihapus")),
+                    );
+                  }
+                }
+              },
+              child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   // Gunakan logika warna yang sama dengan ResultScreen
   Color _getBoxColor(String label) {
@@ -18,10 +58,13 @@ class HistoryDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("Data Bounding Boxes: ${history.boundingBoxes}");
     // Format Waktu
     DateTime dateTime = DateTime.parse(history.detectedAt);
-    String formattedDate = "${dateTime.day} Mei ${dateTime.year}"; // Bisa sesuaikan bulan
-    String formattedTime = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+    String formattedDate =
+        "${dateTime.day} Mei ${dateTime.year}"; // Bisa sesuaikan bulan
+    String formattedTime =
+        "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
 
     double displaySize = MediaQuery.of(context).size.width - 40;
 
@@ -33,12 +76,19 @@ class HistoryDetailScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
+        // ikon delete history
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+            onPressed: () => _confirmDelete(context),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 20),
-            
+
             // --- TAMPILAN GAMBAR ---
             Center(
               child: Container(
@@ -55,20 +105,63 @@ class HistoryDetailScreen extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Image.file(
-                    File(history.imagePath),
-                    width: displaySize,
-                    height: displaySize,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[200],
-                      child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                    ),
+                  child: Stack(
+                    // WAJIB MENGGUNAKAN STACK UNTUK OVERLAY
+                    children: [
+                      // 1. Gambar Dasar
+                      Image.file(
+                        File(history.imagePath),
+                        width: displaySize,
+                        height: displaySize,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey[200],
+                          child: const Icon(
+                            Icons.broken_image,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+
+                      // 2. Overlay Bounding Boxes
+                      // 2. Overlay Bounding Boxes
+                      // 2. Overlay Bounding Boxes (Logika disamakan dengan ResultScreen)
+                      ...?history.boundingBoxes?.map((det) {
+                        if (det == null || det is! Map)
+                          return const SizedBox.shrink();
+
+                        // Ambil koordinat sesuai kunci yang ada di console/ResultScreen
+                        // Kita gunakan ?? 0.0 sebagai antisipasi jika data null
+                        double x = (det['x'] ?? 0.0).toDouble();
+                        double y = (det['y'] ?? 0.0).toDouble();
+                        double w = (det['w'] ?? 0.0).toDouble();
+                        double h = (det['h'] ?? 0.0).toDouble();
+
+                        // Ambil label untuk menentukan warna
+                        String label = det['label'] ?? history.detectedClass;
+                        Color color = _getBoxColor(label);
+
+                        // Perkalian dengan displaySize (factor)
+                        // Karena di ResultScreen kamu mengalikan x, y, w, h langsung dengan displaySize
+                        return Positioned(
+                          left: x * displaySize,
+                          top: y * displaySize,
+                          child: Container(
+                            width: w * displaySize,
+                            height: h * displaySize,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: color, width: 2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
                   ),
                 ),
               ),
             ),
-
             const SizedBox(height: 25),
 
             // --- KARTU INFORMASI ---
@@ -100,11 +193,23 @@ class HistoryDetailScreen extends StatelessWidget {
                         ),
                       ),
                       const Divider(height: 30),
-                      
+
                       // Info Detail
-                      _buildInfoRow(Icons.analytics_outlined, "Keyakinan", "${history.confidenceScore}%"),
-                      _buildInfoRow(Icons.calendar_today_outlined, "Tanggal", formattedDate),
-                      _buildInfoRow(Icons.access_time_outlined, "Waktu", formattedTime),
+                      _buildInfoRow(
+                        Icons.analytics_outlined,
+                        "Keyakinan",
+                        "${history.confidenceScore}%",
+                      ),
+                      _buildInfoRow(
+                        Icons.calendar_today_outlined,
+                        "Tanggal",
+                        formattedDate,
+                      ),
+                      _buildInfoRow(
+                        Icons.access_time_outlined,
+                        "Waktu",
+                        formattedTime,
+                      ),
                     ],
                   ),
                 ),
@@ -124,9 +229,19 @@ class HistoryDetailScreen extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: const Color(0xFF2E5959)),
           const SizedBox(width: 15),
-          Text(label, style: const TextStyle(fontSize: 16, color: Colors.black54)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 16, color: Colors.black54),
+          ),
           const Spacer(),
-          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
         ],
       ),
     );
