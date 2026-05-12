@@ -53,6 +53,7 @@ class PestCard extends StatelessWidget {
               name: selectedPest.name,
               description: selectedPest.description,
               imagePath: selectedPest.imagePath,
+              sources: selectedPest.sources,
             ),
           ),
         );

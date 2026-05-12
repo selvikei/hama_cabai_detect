@@ -154,6 +154,7 @@ class ResultScreen extends StatelessWidget {
                           detectedClass: topLabel,
                           confidenceScore: topConfidence,
                           detectedAt: DateTime.now().toString(),
+                          boundingBoxes: detections,
                         );
 
                         await DatabaseHelper.instance.insertHistory(history);

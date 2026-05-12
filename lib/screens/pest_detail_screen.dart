@@ -4,12 +4,14 @@ class PestDetailScreen extends StatelessWidget {
   final String name;
   final String description;
   final String imagePath;
+  final List<String> sources;
 
   const PestDetailScreen({
     super.key,
     required this.name,
     required this.description,
     required this.imagePath,
+    required this.sources,
   });
 
   @override
@@ -25,7 +27,10 @@ class PestDetailScreen extends StatelessWidget {
         ),
         title: Text(
           name,
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
@@ -61,33 +66,68 @@ class PestDetailScreen extends StatelessWidget {
                   color: Colors.black87,
                 ),
               ),
+
               const SizedBox(height: 25),
 
-              // 4. Label Galeri
-              const SectionTag(label: "Galeri"),
+              // 4. BAGIAN SUMBER DATA
+              const SectionTag(label: "Sumber Data"),
               const SizedBox(height: 12),
 
-              // 5. List Galeri Horizontal
-              SizedBox(
-                height: 100,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 5, // Sesuaikan jumlah gambar galeri
-                  itemBuilder: (context, index) {
-                    return Container(
-                      width: 100,
-                      margin: const EdgeInsets.only(right: 12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        image: DecorationImage(
-                          image: AssetImage(imagePath), // Sementara pakai imagePath yang sama
-                          fit: BoxFit.cover,
-                        ),
+              // Melakukan mapping dari list sources ke widget Text
+              ...sources
+                  .map(
+                    (source) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "• ",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Expanded(
+                            child: Text(
+                              source,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: const Color.fromARGB(255, 62, 62, 62),
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
-              ),
+                    ),
+                  )
+                  .toList(),
+
+              const SizedBox(height: 25),
+
+              // // 4. Label Galeri
+              // const SectionTag(label: "Galeri"),
+              // const SizedBox(height: 12),
+
+              // // 5. List Galeri Horizontal
+              // SizedBox(
+              //   height: 100,
+              //   child: ListView.builder(
+              //     scrollDirection: Axis.horizontal,
+              //     itemCount: 5, // Sesuaikan jumlah gambar galeri
+              //     itemBuilder: (context, index) {
+              //       return Container(
+              //         width: 100,
+              //         margin: const EdgeInsets.only(right: 12),
+              //         decoration: BoxDecoration(
+              //           borderRadius: BorderRadius.circular(12),
+              //           image: DecorationImage(
+              //             image: AssetImage(imagePath), // Sementara pakai imagePath yang sama
+              //             fit: BoxFit.cover,
+              //           ),
+              //         ),
+              //       );
+              //     },
+              //   ),
+              // ),
             ],
           ),
         ),

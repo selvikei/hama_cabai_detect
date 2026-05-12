@@ -4,13 +4,23 @@ import 'package:hama_cabai_detect/widgets/header_section.dart';
 import 'package:hama_cabai_detect/widgets/history_item_card.dart';
 import 'package:hama_cabai_detect/widgets/pest_grid_section.dart';
 import 'package:hama_cabai_detect/screens/detector_screen.dart';
+import 'package:hama_cabai_detect/screens/history_list_screen.dart';
 
-// Import sesuai path yang kamu berikan
 import '../data/database_helper.dart';
-import '../models/history_mode.dart'; // Jika ini typo dari history_model, pastikan namanya sesuai filemu
+import '../models/history_mode.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // Fungsi untuk memicu refresh halaman
+  void _refreshData() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,22 +28,16 @@ class HomePage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          // PADDING UTAMA DIHAPUS agar HeaderSection bisa full width
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. HEADER SECTION (Full Width / Tanpa Padding)
               const HeaderSection(),
-
-              // 2. KONTEN LAINNYA (Diberi Padding 16.0)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 25.0),
-
-                    // Banner untuk Navigasi ke Kamera
+                    const SizedBox(height: 20.0),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -41,47 +45,83 @@ class HomePage extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => const DetectorScreen(),
                           ),
-                        ).then((value) {
-                          // Opsional: Refresh halaman saat kembali dari deteksi
-                          // (Mengingat ini StatelessWidget, kamu mungkin perlu
-                          // mengubahnya ke StatefulWidget jika ingin refresh otomatis)
-                        });
+                        ).then(
+                          (_) => _refreshData(),
+                        ); // Refresh saat kembali dari kamera
                       },
                       child: const DetectionBanner(),
                     ),
-
-                    const SizedBox(height: 25.0),
+                    const SizedBox(height: 20.0),
                     const PestGridSection(),
-                    const SizedBox(height: 25.0),
+                    const SizedBox(height: 20.0),
 
-                    // --- BAGIAN RIWAYAT DETEKSI ---
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 6,
-                        horizontal: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2E5959),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Text(
-                        "Riwayat Deteksi",
-                        style: TextStyle(
-                          fontFamily:
-                              'PlusJakartaSans', // Menggunakan font baru
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500, // Medium sesuai pubspec
-                          color: Color(0xFFE9EFEF),
+                    // --- HEADER RIWAYAT DENGAN IKON PANAH ---
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Box Teks "Riwayat Deteksi"
+                        Container(
+                          height: 36, // Tentukan tinggi pasti (misal: 36)
+                          alignment:
+                              Alignment.center, // Pusatkan teks secara vertikal
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2E5959),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            "Riwayat Deteksi",
+                            style: TextStyle(
+                              fontFamily: 'PlusJakartaSans',
+                              fontSize:
+                                  13, // Sedikit disesuaikan agar proporsional
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFE9EFEF),
+                            ),
+                          ),
                         ),
-                      ),
+
+                        // Tombol Bullet Panah
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HistoryListScreen(),
+                              ),
+                            ).then((_) => _refreshData());
+                          },
+                          child: Container(
+                            height: 36, // Tinggi harus sama dengan box teks
+                            width:
+                                36, // Lebar sama dengan tinggi agar jadi lingkaran sempurna
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFE9EFEF),
+                              shape: BoxShape
+                                  .circle, // Gunakan shape circle untuk bullet
+                            ),
+                            child: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size:
+                                  14, // Ukuran ikon diperkecil sedikit agar manis dalam bullet
+                              color: Color(0xFF2E5959),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     Text(
                       "(Riwayat hanya tersimpan secara lokal pada ponsel)",
-                      style: TextStyle(fontWeight: FontWeight.w300, color: Colors.grey[600], fontSize: 10, fontFamily: 'Inter', fontStyle: FontStyle.italic),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        color: Colors.grey[600],
+                        fontSize: 10,
+                        fontFamily: 'Inter',
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
-                    const SizedBox(height: 15.0),
+                    const SizedBox(height: 7.0),
 
-                    // FutureBuilder untuk menarik data dari SQLite
                     FutureBuilder<List<HistoryModel>>(
                       future: DatabaseHelper.instance.getAllHistory(),
                       builder: (context, snapshot) {
@@ -104,7 +144,7 @@ class HomePage extends StatelessWidget {
                               child: Text(
                                 "Belum ada riwayat deteksi",
                                 style: TextStyle(
-                                  fontFamily: 'Inter', // Menggunakan font Inter
+                                  fontFamily: 'Inter',
                                   color: Colors.grey[400],
                                   fontSize: 14,
                                 ),
@@ -113,9 +153,11 @@ class HomePage extends StatelessWidget {
                           );
                         }
 
-                        final historyList = snapshot.data!;
+                        // MENGAMBIL 3 DATA TERBARU
+                        // diasumsikan getAllHistory() mengembalikan data dari yang lama ke baru,
+                        // maka kita reverse lalu ambil 3.
+                        final historyList = snapshot.data!.take(3).toList();
 
-                        // Tampilkan daftar history secara dinamis
                         return Column(
                           children: historyList.map((item) {
                             return HistoryItemCard(history: item);

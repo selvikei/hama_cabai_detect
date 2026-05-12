@@ -20,9 +20,25 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 4, // NAIKKAN LAGI KE VERSI 4
       onCreate: _createDB,
+      onUpgrade: _onUpgrade,
     );
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    // Kita buat logikanya lebih luas:
+    // "Jika versi lama di bawah 4, pastikan kolom ini ada"
+    if (oldVersion < 4) {
+      try {
+        await db.execute('''
+          ALTER TABLE history ADD COLUMN bounding_boxes TEXT
+        ''');
+      } catch (e) {
+        // Jika kolom ternyata sudah ada, catch ini akan mencegah aplikasi crash
+        print("Kolom mungkin sudah ada: $e");
+      }
+    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -32,7 +48,8 @@ class DatabaseHelper {
         image_path TEXT NOT NULL,
         detected_class TEXT NOT NULL,
         confidence_score TEXT NOT NULL,
-        detected_at TEXT NOT NULL
+        detected_at TEXT NOT NULL,
+        bounding_boxes TEXT
       )
     ''');
   }
@@ -54,5 +71,11 @@ class DatabaseHelper {
   Future<int> deleteHistory(int id) async {
     final db = await instance.database;
     return await db.delete('history', where: 'ID = ?', whereArgs: [id]);
+  }
+
+  // hapus semua data
+  Future<int> deleteAllHistory() async {
+    final db = await instance.database;
+    return await db.delete('history');
   }
 }

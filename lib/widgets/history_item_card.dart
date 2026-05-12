@@ -30,7 +30,7 @@ class HistoryItemCard extends StatelessWidget {
       );
     },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 18),
+        margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(0),
         decoration: BoxDecoration(
           color: const Color(0xFFE9EFEF),
@@ -42,8 +42,8 @@ class HistoryItemCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: SizedBox(
-                width: 100,
-                height: 100,
+                width: 90,
+                height: 90,
                 child: Image.file(
                   File(history.imagePath),
                   fit: BoxFit.cover,
@@ -69,7 +69,7 @@ class HistoryItemCard extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text("Tanggal : $datePart", style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                  SizedBox(height: 10),
+                  SizedBox(height: 6),
                   Text("Jam : $timePart", style: const TextStyle(color: Colors.grey, fontSize: 12)),
                 ],
               ),
