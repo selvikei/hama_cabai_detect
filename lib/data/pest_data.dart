@@ -11,6 +11,11 @@ class PestData {
         "assets/images/kutu_daun_1.jpg",
         "assets/images/kutu_daun_2.jpg",
       ],
+      sources: [
+        "Pusat Penelitian dan Pengembangan Hortikultura (Puslitbanghorti): Pedoman Budidaya Cabai Merah.",
+        "CABI Digital Library: Aphis gossypii (cotton aphid) datasheet.",
+        "Jurnal Entomologi Indonesia: Studi bionomi dan efisiensi penularan virus oleh Aphis gossypii pada tanaman Capsicum.",
+      ],
     ),
     Pest(
       name: "Kutu Kebul",
@@ -18,6 +23,10 @@ class PestData {
       imagePath: "assets/images/kutu_kebul.jpg",
       description: "Kutu kebul, atau Bemisia tabaci, merupakan salah satu hama utama pada tanaman cabai yang menyerang dengan cara mengisap cairan sel daun. Aktivitas makan ini menyebabkan daun mengalami klorosis (menguning), pertumbuhan tanaman menjadi kerdil, dan penurunan produktivitas yang signifikan. Selain kerusakan langsung, kutu kebul sangat diwaspadai karena perannya sebagai vektor utama virus gemini (Pepper Yellow Leaf Curl Virus) yang menyebabkan penyakit bule atau kuning pada cabai, dengan potensi kehilangan hasil mencapai 20% hingga 100% pada serangan berat. Hama ini mengekskresikan embun madu yang memicu pertumbuhan jamur jelaga (embun jelaga) pada permukaan daun, sehingga menghambat proses fotosintesis. Secara morfologis, kutu kebul dewasa berukuran sangat kecil (1-1,5 mm), berwarna putih karena tubuhnya tertutup lapisan lilin tepung, dan biasanya berkerumun di sisi bawah daun.",
       gallery: [],
+      sources: [
+        "Balai Penelitian Tanaman Sayuran (BALITSA) - Kementerian Pertanian RI.",
+        "CABI - Invasive Species Compendium (Bemisia tabaci).",
+      ],
     ),
     Pest(
       name: "Thrips",
@@ -25,6 +34,10 @@ class PestData {
       imagePath: "assets/images/thrips.jpg",
       description: "Thrips, khususnya spesies Thrips parvispinus, adalah hama penghisap cairan daun yang sangat merusak pada berbagai fase pertumbuhan tanaman cabai. Gejala serangan khas ditandai dengan adanya bercak-bercak keperakan pada permukaan bawah daun yang kemudian berubah menjadi cokelat tembaga, serta menyebabkan tepi daun melengkung ke atas atau mengeriting. Serangan pada pucuk tanaman dapat menyebabkan tunas baru terhenti pertumbuhannya (stagnan) dan bunga menjadi rontok. Serupa dengan hama penghisap lainnya, Thrips berperan sebagai vektor virus penting seperti Tomato Spotted Wilt Virus (TSWV). Secara visual, Thrips memiliki tubuh yang sangat ramping, berwarna kuning pucat hingga cokelat kehitaman, dan sangat aktif bergerak sehingga sulit dideteksi dengan mata telanjang tanpa bantuan alat pembesar.",
       gallery: [],
+      sources: [
+        "Direktorat Perlindungan Tanaman Hortikultura - Kementerian Pertanian RI.",
+        "Jurnal Perlindungan Tanaman Indonesia (Identification and Biology of Thrips parvispinus).",
+      ],
     ),
   ];
 }

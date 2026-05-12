@@ -4,6 +4,7 @@ class Pest {
   final String description;
   final String imagePath;
   final List<String> gallery;
+  final List<String> sources;
 
   Pest({
     required this.name,
@@ -11,5 +12,6 @@ class Pest {
     required this.description,
     required this.imagePath,
     required this.gallery,
+    required this.sources,
   });
 }

@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 25.0),
+                    const SizedBox(height: 20.0),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -45,54 +45,67 @@ class _HomePageState extends State<HomePage> {
                           MaterialPageRoute(
                             builder: (context) => const DetectorScreen(),
                           ),
-                        ).then((_) => _refreshData()); // Refresh saat kembali dari kamera
+                        ).then(
+                          (_) => _refreshData(),
+                        ); // Refresh saat kembali dari kamera
                       },
                       child: const DetectionBanner(),
                     ),
-                    const SizedBox(height: 25.0),
+                    const SizedBox(height: 20.0),
                     const PestGridSection(),
-                    const SizedBox(height: 25.0),
+                    const SizedBox(height: 20.0),
 
                     // --- HEADER RIWAYAT DENGAN IKON PANAH ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 6,
-                                horizontal: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF2E5959),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Text(
-                                "Riwayat Deteksi",
-                                style: TextStyle(
-                                  fontFamily: 'PlusJakartaSans',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFFE9EFEF),
-                                ),
-                              ),
+                        // Box Teks "Riwayat Deteksi"
+                        Container(
+                          height: 36, // Tentukan tinggi pasti (misal: 36)
+                          alignment:
+                              Alignment.center, // Pusatkan teks secara vertikal
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2E5959),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            "Riwayat Deteksi",
+                            style: TextStyle(
+                              fontFamily: 'PlusJakartaSans',
+                              fontSize:
+                                  13, // Sedikit disesuaikan agar proporsional
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFE9EFEF),
                             ),
-                          ],
+                          ),
                         ),
-                        // Tombol Panah Ke Halaman Semua Riwayat
-                        IconButton(
-                          onPressed: () {
+
+                        // Tombol Bullet Panah
+                        GestureDetector(
+                          onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const HistoryListScreen()),
+                              MaterialPageRoute(
+                                builder: (context) => const HistoryListScreen(),
+                              ),
                             ).then((_) => _refreshData());
                           },
-                          icon: const Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            size: 18,
-                            color: Color(0xFF2E5959),
+                          child: Container(
+                            height: 36, // Tinggi harus sama dengan box teks
+                            width:
+                                36, // Lebar sama dengan tinggi agar jadi lingkaran sempurna
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFE9EFEF),
+                              shape: BoxShape
+                                  .circle, // Gunakan shape circle untuk bullet
+                            ),
+                            child: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size:
+                                  14, // Ukuran ikon diperkecil sedikit agar manis dalam bullet
+                              color: Color(0xFF2E5959),
+                            ),
                           ),
                         ),
                       ],
@@ -107,12 +120,13 @@ class _HomePageState extends State<HomePage> {
                         fontStyle: FontStyle.italic,
                       ),
                     ),
-                    const SizedBox(height: 15.0),
+                    const SizedBox(height: 7.0),
 
                     FutureBuilder<List<HistoryModel>>(
                       future: DatabaseHelper.instance.getAllHistory(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const Center(
                             child: Padding(
                               padding: EdgeInsets.symmetric(vertical: 20),
@@ -140,9 +154,9 @@ class _HomePageState extends State<HomePage> {
                         }
 
                         // MENGAMBIL 3 DATA TERBARU
-                        // diasumsikan getAllHistory() mengembalikan data dari yang lama ke baru, 
+                        // diasumsikan getAllHistory() mengembalikan data dari yang lama ke baru,
                         // maka kita reverse lalu ambil 3.
-                        final historyList = snapshot.data!.reversed.take(3).toList();
+                        final historyList = snapshot.data!.take(3).toList();
 
                         return Column(
                           children: historyList.map((item) {

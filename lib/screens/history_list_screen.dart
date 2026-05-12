@@ -100,15 +100,15 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
           }
 
           // Urutkan dari yang terbaru ke terlama
-          final allHistory = snapshot.data!.reversed.toList();
+          final allHistory = snapshot.data!.toList();
 
           return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
             itemCount: allHistory.length,
             itemBuilder: (context, index) {
               final item = allHistory[index];
               return Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
+                padding: const EdgeInsets.only(bottom: 0),
                 child: HistoryItemCard(history: item),
               );
             },

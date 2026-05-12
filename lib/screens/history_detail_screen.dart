@@ -151,8 +151,8 @@ class HistoryDetailScreen extends StatelessWidget {
                             width: w * displaySize,
                             height: h * displaySize,
                             decoration: BoxDecoration(
-                              border: Border.all(color: color, width: 2),
-                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: color, width: 1),
+                              borderRadius: BorderRadius.circular(0),
                             ),
                           ),
                         );

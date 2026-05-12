@@ -30,7 +30,7 @@ class HistoryItemCard extends StatelessWidget {
       );
     },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 18),
+        margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(0),
         decoration: BoxDecoration(
           color: const Color(0xFFE9EFEF),
