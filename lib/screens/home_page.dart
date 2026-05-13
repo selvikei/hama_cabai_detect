@@ -3,6 +3,7 @@ import 'package:hama_cabai_detect/widgets/detection_banner.dart';
 import 'package:hama_cabai_detect/widgets/header_section.dart';
 import 'package:hama_cabai_detect/widgets/history_item_card.dart';
 import 'package:hama_cabai_detect/widgets/pest_grid_section.dart';
+import 'package:hama_cabai_detect/widgets/chili_card.dart';
 import 'package:hama_cabai_detect/screens/detector_screen.dart';
 import 'package:hama_cabai_detect/screens/history_list_screen.dart';
 
@@ -51,6 +52,9 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: const DetectionBanner(),
                     ),
+                    const SizedBox(height: 20.0),
+                    // --- SECTION CABAI (BARU) ---
+                    const ChiliCard(),
                     const SizedBox(height: 20.0),
                     const PestGridSection(),
                     const SizedBox(height: 20.0),
